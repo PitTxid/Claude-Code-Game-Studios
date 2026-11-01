@@ -2,7 +2,8 @@
 name: devops-engineer
 description: "Build pipelines, CI/CD configuration, version control workflow, branching strategy, automated test pipelines, deployment infrastructure."
 tools: Read, Glob, Grep, Write, Edit, Bash
-model: sonnet
+model: flash
+effort: low
 maxTurns: 10
 ---
 

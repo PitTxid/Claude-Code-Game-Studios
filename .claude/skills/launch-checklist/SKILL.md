@@ -5,7 +5,8 @@ argument-hint: "[launch-date or 'dry-run']"
 user-invocable: true
 disable-model-invocation: true
 allowed-tools: Read, Glob, Grep, Write, AskUserQuestion, Bash(bash "*/.claude/skills/launch-checklist/../../hooks/yaml-helper.sh" resolve_config *)
-model: sonnet
+model: flash
+effort: low
 ---
 !`bash "${CLAUDE_SKILL_DIR}/../../hooks/yaml-helper.sh" resolve_config --keys rigor,workflow,project.stage,cert_tier,automation`
 

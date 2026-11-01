@@ -4,7 +4,8 @@ description: "Architectural code review — coding standards, SOLID, testability
 argument-hint: "[path-to-file-or-directory]"
 user-invocable: true
 allowed-tools: Read, Glob, Grep, Bash(git log *), Agent, AskUserQuestion, Bash(bash "*/.claude/skills/code-review/../../hooks/yaml-helper.sh" resolve_config *)
-model: sonnet
+model: pro
+effort: medium
 ---
 
 !`bash "${CLAUDE_SKILL_DIR}/../../hooks/yaml-helper.sh" resolve_config --keys automation`

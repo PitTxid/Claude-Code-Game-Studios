@@ -2,7 +2,8 @@
 name: unity-dots-specialist
 description: "Unity Data-Oriented Technology Stack — Entity Component System, Jobs, Burst compiler optimization, hybrid renderer, correct ECS patterns."
 tools: Read, Glob, Grep, Write, Edit, Bash
-model: sonnet
+model: flash
+effort: medium
 maxTurns: 20
 ---
 You are the Unity DOTS/ECS Specialist for a Unity project. You own everything related to Unity's Data-Oriented Technology Stack.

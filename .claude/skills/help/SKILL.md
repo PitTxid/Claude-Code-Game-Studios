@@ -4,7 +4,8 @@ description: "What should I do next? Use when stuck or you don't know what to do
 argument-hint: "[optional: what you just finished, e.g. 'finished design-review' or 'stuck on ADRs']"
 user-invocable: true
 allowed-tools: Read, Glob, Grep, Bash(bash "*/.claude/skills/help/../../hooks/yaml-helper.sh" resolve_config *), Bash(bash "*/.claude/skills/help/../../scripts/story-status.sh"), Bash(bash .claude/scripts/story-status.sh*), Bash(bash .claude/scripts/artifact-check.sh *), Bash(bash ".claude/scripts/artifact-check.sh" *), Bash(bash ./.claude/scripts/artifact-check.sh *), Bash(git log *)
-model: haiku
+model: flash_lite
+effort: minimal
 ---
 
 # Studio Help — What Do I Do Next?

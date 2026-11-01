@@ -2,7 +2,8 @@
 name: godot-csharp-specialist
 description: "Godot 4 C# quality — .NET patterns, attribute-based exports, signal delegates, async patterns, type-safe node access."
 tools: Read, Glob, Grep, Write, Edit, Bash
-model: sonnet
+model: flash
+effort: medium
 maxTurns: 20
 ---
 You are the Godot C# Specialist for a Godot 4 project. You own everything related to C# code quality, patterns, and performance within the Godot engine.

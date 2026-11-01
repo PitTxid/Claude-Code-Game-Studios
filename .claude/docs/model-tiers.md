@@ -1,106 +1,52 @@
-# Model Tier Assignment
+# Model & Effort Tier Assignment (Antigravity Edition)
 
-> ### When a skill's `model:` is used — skills only
->
-> A skill's `model:` overrides the session model for the rest of the turn the
-> skill runs in, and your next prompt returns to the session model. Whether the
-> override happens depends on how the skill starts:
->
-> | How the skill starts | Is `model:` used? |
-> |---|---|
-> | You type `/skill-name` in Manual (`default`) mode | Yes |
-> | You type `/skill-name` in auto mode | `sonnet` and `opus`: yes. `haiku`: no — auto mode does not support Haiku, so the session keeps its model |
-> | Claude starts the skill itself, through the Skill tool | No — the session model runs it |
->
-> Two things follow:
->
-> - **An `opus` skill costs more in a Sonnet session.** Typing
->   `/architecture-review`, `/gate-check` or `/review-all-gdds` moves that turn
->   to Opus.
-> - **A `haiku` skill saves nothing in auto mode** (this project's settings start
->   terminal sessions in Manual, but a user can switch) — or when Claude starts
->   it. Never tell a user a `haiku` tier is saving them money.
->
-> Because the override ends at your next prompt, a skill that stops to ask you
-> something in chat finishes on the session model after you answer.
->
-> **This does NOT apply to agents.** `model:` in `.claude/agents/*.md` is a
-> different mechanism, spawned as a separate session rather than executed inline,
-> and Claude Code documents it as applied: it is second in the subagent model
-> order, after a `model` Claude passes for one invocation. See the agent section
-> below.
+> **Zero `inherit` Policy:** Every agent (`.claude/agents/*.md`) and every skill (`.claude/skills/*/SKILL.md`) declares an explicit pinned **`model:`** (`pro`, `flash`, or `flash_lite`) and **`effort:`** (`high`, `medium`, `low`, or `minimal`) in its YAML frontmatter. When invoking any subagent via `invoke_subagent`, always pass the pinned `Model` and prepend the matching **Reasoning Effort Directive** from `.agents/model-effort-routing.md`.
 
-Skills and agents are assigned tiers by task complexity. A tier is written as
-the alias `model:` takes, never as a model ID: Claude Code resolves each alias
-to the current model in that family, so this table does not change when a new
-model ships.
+## Model & Effort Tiers Overview
 
-| Tier | `model:` | When to use |
-|------|----------|-------------|
-| **Haiku** | `haiku` | Read-only status checks, formatting, simple lookups — no creative judgment needed |
-| **Sonnet** | `sonnet` | Implementation, design authoring, analysis of individual systems — default for most work |
-| **Opus** | `opus` | Multi-document synthesis, high-stakes phase gate verdicts, cross-system holistic review |
-| **Session** | `inherit` | Agents only — runs on whatever model the session runs |
+| Tier | `model:` | `effort:` | When to use |
+|------|----------|-----------|-------------|
+| **Tier A — Strategic & High-Risk Architecture** | `pro` | `high` | Multi-document synthesis, phase-gate verdicts, core engine/networking/security architecture, deep code review |
+| **Tier B — Core Gameplay/AI Coding & System Design** | `pro` | `medium` | Main game logic implementation (`/dev-story` gameplay & AI), system GDD authoring, primary engine architecture |
+| **Tier C — Feature Implementation, UI & Engine Idioms** | `flash` | `medium` | UI code, feature/team orchestration, sprint/epic decomposition, 12 engine sub-specialists |
+| **Tier D — Direct Execution, Content & Prototyping** | `flash` | `low` | Content/ops department leads, throwaway prototypes, build/editor tools, release checklists |
+| **Tier E — Fast Checklists, QA & Lookups** | `flash_lite` | `minimal` | Read-only status checks, formatting, QA test-case scaffolding, localization & accessibility checklists |
 
-Skills with `model: haiku` (5): `/help`, `/onboard`, `/project-stage-detect`,
-`/scope-check`, `/sprint-status`
+---
 
-> `/patch-notes` and `/changelog` are `sonnet`, not `haiku`: both produce
-> **player-facing** copy and need judgement the cheapest tier is defined as not
-> doing. Full reasoning in each skill's own header.
->
-> `/settings` was moved off `haiku` for the same reason. It does not only read
-> and format — it resolves every leaf with provenance and then compares the
-> configured rigor against the project's observable working practice. That is
-> synthesis, which is what the Haiku row is defined as excluding.
+## 1. Main Coding Workflow (`/dev-story` & `/team-*` Phase 3)
 
-Skills with `model: opus` (3): `/architecture-review`, `/gate-check`, `/review-all-gdds`
+- **`pro` + `high`:** `engine-programmer` (Foundation), `network-programmer` (Networking), `security-engineer`, `lead-programmer` (`/code-review`)
+- **`pro` + `medium`:** `gameplay-programmer` (Core/Feature Gameplay — ~70% of game code), `ai-programmer` (NPC/Boss AI & pathfinding) *(escalate to `high` for complex state machines, physics, or custom math)*
+- **`flash` + `medium`:** `ui-programmer` (UI), `tools-programmer`, `prototyper`
+- **`flash` + `low`:** 12 Engine Sub-Specialists (`godot-*`, `unity-*`, `ue-*`) for post-code engine API verification
+- **`flash_lite` + `minimal`:** `qa-tester` and Config/Data JSON updates
 
-All other skills are Sonnet. When creating a new skill, assign Haiku if it only
-reads and formats; assign Opus if it must synthesize 5+ documents with
-high-stakes output; otherwise write `model: sonnet` explicitly. Every skill
-declares a tier. Whether the tier takes effect depends on how the skill starts
-(see the table at the top of this file).
+---
 
-**Agent model tiers.** 30 agents use `model: inherit` and run on the session's
-model. 19 are pinned:
+## 2. Planning Pipeline Tiers
 
-- **opus (3):** `creative-director`, `producer`, `technical-director`. Under an
-  Opus session an `opus` pin runs on the session's exact model, `[1m]` included,
-  so it never gets a smaller window than its parent.
-- **sonnet (16):** `lead-programmer`, `prototyper`, `devops-engineer`,
-  `community-manager` and the 12 engine sub-specialists:
-  `godot-csharp-specialist`, `godot-gdextension-specialist`,
-  `godot-gdscript-specialist`, `godot-shader-specialist`,
-  `ue-blueprint-specialist`, `ue-gas-specialist`, `ue-replication-specialist`,
-  `ue-umg-specialist`, `unity-addressables-specialist`,
-  `unity-dots-specialist`, `unity-shader-specialist`, `unity-ui-specialist`.
-  `/dev-story` and `/code-review` spawn the sub-specialists named in
-  `project.yaml`'s `specialists` block (which `/setup-engine` writes); `/team-ui` spawns
-  `unity-ui-specialist` and `ue-umg-specialist`; `/team-release` spawns
-  `devops-engineer` and `community-manager`, and `/team-live-ops` spawns
-  `community-manager`.
-- **haiku (0):** no agent. The Haiku row above is for read-only lookups and
-  formatting; every agent drafts, writes or judges. Building CI pipelines and
-  writing player-facing text are Sonnet work, as they are for `/patch-notes`.
+1. **Concept & Brainstorming (`/brainstorm`, `/quick-design`):** `flash` + `medium` (Director gates at `full` rigor run `creative-director` on `pro` + `high`)
+2. **Systems & Architecture Blueprint (`/map-systems`, `/create-architecture`, `/architecture-decision`, `/create-control-manifest`):** `pro` + `high` / `medium`
+3. **Production & Sprint Planning (`/create-epics`, `/create-stories`, `/sprint-plan`, `/estimate`):** Decomposition on `flash` + `medium`/`low`; Scope & readiness gate by `producer` on `pro` + `high`
+4. **Pre-Coding Architecture Sketch (Phase 2 of `/team-*` & `/dev-story`):** `pro` + `medium` (`lead-programmer` / `<engine>-specialist`)
 
-Every agent not named above is `inherit`. The `model:` line in the agent's own
-file is what runs.
+---
 
-A pin gets that model's context window, whatever the session runs. On the
-Anthropic API `sonnet` currently resolves to Sonnet 5, which always has a 1M
-window, so a `sonnet` pin is not smaller than a 1M session there; `haiku`
-resolves to Haiku 4.5 and its 200K window, and behind an LLM gateway a `sonnet`
-pin can be smaller too. A subagent starts from
-the brief it is given, not the parent's conversation, so this only matters when
-a brief is very large. If a pinned agent does overflow, run every subagent on
-the session's model with one line in your `.claude/settings.local.json`
-(Claude Code v2.1.257 or later):
+## 3. All 49 Agents by `[model + effort]`
 
-```json
-{ "env": { "CLAUDE_CODE_SUBAGENT_MODEL_FORCE": "1" } }
-```
+- **`pro` + `high` (8):** `creative-director`, `technical-director`, `producer`, `lead-programmer`, `systems-designer`, `economy-designer`, `network-programmer`, `security-engineer`
+- **`pro` + `medium` (7):** `gameplay-programmer`, `ai-programmer`, `engine-programmer`, `game-designer`, `godot-specialist`, `unity-specialist`, `unreal-specialist`
+- **`flash` + `medium` (17):** `ui-programmer`, `performance-analyst`, `level-designer`, `ux-designer`, `live-ops-designer`, `godot-gdscript-specialist`, `godot-csharp-specialist`, `godot-shader-specialist`, `godot-gdextension-specialist`, `unity-dots-specialist`, `unity-shader-specialist`, `unity-addressables-specialist`, `unity-ui-specialist`, `ue-gas-specialist`, `ue-blueprint-specialist`, `ue-replication-specialist`, `ue-umg-specialist`
+- **`flash` + `low` (12):** `art-director`, `audio-director`, `narrative-director`, `qa-lead`, `release-manager`, `prototyper`, `tools-programmer`, `devops-engineer`, `technical-artist`, `sound-designer`, `writer`, `world-builder`
+- **`flash_lite` + `minimal` (5):** `qa-tester`, `accessibility-specialist`, `localization-lead`, `analytics-engineer`, `community-manager`
 
-It applies to **every** pin, the three `opus` directors included: under a
-Sonnet session they run on Sonnet too. `CLAUDE_CODE_SUBAGENT_MODEL` alone does
-not do it: it applies only to agents that set no model of their own.
+---
+
+## 4. All 74 Skills by `[model + effort]`
+
+- **`pro` + `high` (5):** `/architecture-review`, `/gate-check`, `/review-all-gdds`, `/create-architecture`, `/security-audit`
+- **`pro` + `medium` (8):** `/map-systems`, `/design-system`, `/architecture-decision`, `/create-control-manifest`, `/balance-check`, `/design-review`, `/code-review`, `/dev-story`
+- **`flash` + `medium` (31):** `/brainstorm`, `/quick-design`, `/create-epics`, `/create-stories`, `/sprint-plan`, `/prototype`, `/vertical-slice`, `/ux-design`, `/ux-review`, `/art-bible`, `/asset-spec`, `/propagate-design-change`, `/reverse-document`, `/perf-profile`, `/tech-debt`, `/soak-test`, `/regression-suite`, `/test-flakiness`, `/skill-improve`, `/hotfix`, `/day-one-patch`, `/localize`, `/team-combat`, `/team-narrative`, `/team-ui`, `/team-release`, `/team-polish`, `/team-audio`, `/team-level`, `/team-live-ops`, `/team-qa`
+- **`flash` + `low` (20):** `/start`, `/settings`, `/setup-engine`, `/adopt`, `/story-done`, `/story-readiness`, `/estimate`, `/bug-report`, `/bug-triage`, `/changelog`, `/patch-notes`, `/release-checklist`, `/launch-checklist`, `/retrospective`, `/milestone-review`, `/playtest-report`, `/content-audit`, `/qa-plan`, `/test-setup`, `/test-evidence-review`
+- **`flash_lite` + `minimal` (10):** `/help`, `/onboard`, `/project-stage-detect`, `/scope-check`, `/sprint-status`, `/smoke-check`, `/asset-audit`, `/consistency-check`, `/test-helpers`, `/skill-test`

@@ -2,7 +2,8 @@
 name: localization-lead
 description: "Internationalization architecture — i18n system design, string extraction workflows, locale testing, locale-specific issues, translation pipeline."
 tools: Read, Glob, Grep, Write, Edit, Bash
-model: inherit
+model: flash_lite
+effort: minimal
 maxTurns: 20
 memory: project
 ---
